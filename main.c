@@ -78,16 +78,14 @@ struct location {
     int sectors_quantity;
     t_location *next;
 };
- 
-const string SENSOR_TYPES_STRING_MAPPED[] = {"TEMPERATURE", "VIBRATION", "PRESSURE", "CURRENT", "HUMIDITY"};
-const string SENSOR_TYPES_UNIT_STRING_MAPPED[] = {"°C", "mm/s", "PSI", "A", "%"};
- 
-bool is_program_running = true;
 
-int *location_selected_idx = NULL;
-int *sector_selected_idx = NULL;
-int *sensor_selected_idx = NULL;
-int *inspection_selected_idx = NULL;
+typedef struct mapSensorTypeToStringResponse {
+    string response;
+} t_mapSensorTypeToStringResponse;
+
+typedef struct mapSensorTypeUnitToStringResponse {
+    string response;
+} t_mapSensorTypeUnitToStringResponse;
 
 void menuLocations(void);
 void menuSectors(void);
@@ -97,7 +95,26 @@ void actionMenuSectors(int option);
 void actionMenuSensors(int option);
 void actionMenuSensorsInspection(int option);
 
+t_mapSensorTypeToStringResponse mapSensorTypeToString(int sensor_type_enum){
+    t_mapSensorTypeToStringResponse object;
+    string SENSOR_TYPES_STRING_MAPPED[] = {"TEMPERATURE", "VIBRATION", "PRESSURE", "CURRENT", "HUMIDITY"};
+    strcpy(object.response, SENSOR_TYPES_STRING_MAPPED[sensor_type_enum]);
+    return object;
+}
+
+t_mapSensorTypeUnitToStringResponse mapSensorTypeUnitToString(int sensor_type_unit_enum){
+    t_mapSensorTypeUnitToStringResponse object;
+    string SENSOR_TYPES_UNIT_STRING_MAPPED[] = {"°C", "mm/s", "PSI", "A", "%"};    
+    strcpy(object.response, SENSOR_TYPES_UNIT_STRING_MAPPED[sensor_type_unit_enum]);
+    return object;
+}
+
 int main(){
+    bool is_program_running = true;
+    int *location_selected_idx = NULL;
+    int *sector_selected_idx = NULL;
+    int *sensor_selected_idx = NULL;
+    int *inspection_selected_idx = NULL;
     srand(time(NULL));
     for(;;){
         if(!is_program_running){
@@ -136,7 +153,7 @@ void menuLocations(){
         scanf("%i", &option);
         getchar();
         if(option == 0){
-            is_program_running = false;
+            //is_program_running = false;
             return;
         }
         actionMenuLocations(option);
@@ -154,7 +171,6 @@ void menuSectors(){
 }
 void menuSensors(){
         int option;
-        if(sensor_selected_idx == NOT_FOUND){
         printf(" Escolha uma opção: ");
         printf("1. Criar sensor. \n");
         printf("2. Listar sensores. \n");
@@ -163,7 +179,9 @@ void menuSensors(){
         scanf("%i", &option);
         getchar();
         actionMenuSensors(option);
-        } else {
+}
+void menuInspection(){
+        int option;
         printf("Escolha uma opção: \n");
         printf("1. Gerar leitura no sensor. \n");
         printf("2. Listar leituras do sensor. \n");
@@ -171,7 +189,6 @@ void menuSensors(){
         scanf("%i", &option);
         getchar();
         actionMenuSensorsInspection(option);
-        }
 }
 
 void actionMenuLocations(int option){
