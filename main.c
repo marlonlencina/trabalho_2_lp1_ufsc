@@ -83,50 +83,56 @@ typedef struct stringAsStructResponse {
     string response;
 } t_string;
 
+typedef struct appState {
+    t_location *locations;       
+    t_location *location_selected_pointer;
+    t_sector   *sector_selected_pointer;
+    t_sensor   *sensor_selected_pointer;
+    t_inspection *inspection_selected_pointer;
+} t_app_state;
 
-void menuLocations(t_location **locations, t_location *location_selected);
-void menuSectors(void);
+void menuLocations(t_location **locations, t_location **location_selected);
+void menuSectors(t_app_state *app_state);
 void menuSensors(void);
-void actionMenuLocations(int option, t_location **locations, t_location *location_selected);
-void actionMenuSectors(int option);
+void actionMenuLocations(int option, t_location **locations, t_location **location_selected_pointer);
+void actionMenuSectors(int option, t_app_state *app_state);
 void actionMenuSensors(int option);
 void actionMenuInspections(int option);
 
 void shutdownProgram();
+void resetStateOfMenuSelectedPointers(t_entities entity_type, t_app_state *state);
 void generateUniqueId(char* buffer, t_entities entity_type);
 void formatStringRemoveEnter(string str);
 void formatStringToUppercase(string str);
 void formatStringToSystemPattern(string str);
 
 t_location *createNewLocation();
-void listAllLocations(t_location **list_location);
-void insertNewLocationAtDatabase(t_location **list,  t_location *new_location);
+void listAllLocations(t_location **list_locations);
+void insertNewLocationAtDatabase(t_location **list_locations,  t_location *new_location);
+void selectLocation(t_location *location, t_location **location_selected);
+t_location *findLocationById(t_location **list_locations, string location_id);
 
 int main(){
     srand(time(NULL));
-    t_location *locations;
-    t_location *location_selected_pointer = NULL;
-    t_sector *sector_selected_pointer = NULL;
-    t_sensor *sensor_selected_pointer = NULL;
-    t_inspection *inspection_selected_pointer = NULL;
+    t_app_state app_state = {0};
     for(;;){
         if(
-            location_selected_pointer != NULL &&
-            sector_selected_pointer != NULL
+            app_state.location_selected_pointer != NULL &&
+            app_state.sector_selected_pointer != NULL
         ){
             menuSensors();
         } else if(
-            location_selected_pointer != NULL
+            app_state.location_selected_pointer != NULL
         ){
-            menuSectors(); 
+            menuSectors(&app_state); 
         } else {
-            menuLocations(&locations, location_selected_pointer);
+            menuLocations(&app_state.locations, &app_state.location_selected_pointer);
         }   
     }
     return 0;
 }
 
-void menuLocations(t_location **locations, t_location *location_selected_pointer){
+void menuLocations(t_location **locations, t_location **location_selected_pointer){
         int option;
         printf("Bem-vindo 👋. \n");
         printf("Escolha uma opção: \n");
@@ -142,7 +148,7 @@ void menuLocations(t_location **locations, t_location *location_selected_pointer
         }
         actionMenuLocations(option, locations, location_selected_pointer);
 }
-void menuSectors(){
+void menuSectors(t_app_state *app_state){
         int option;
         printf("Escolha uma opção: \n");
         printf("1. Criar setor. \n");
@@ -151,7 +157,7 @@ void menuSectors(){
         printf("0. Voltar. \n");
         scanf("%i", &option);
         getchar();
-        actionMenuSectors(option);
+        actionMenuSectors(option, app_state);
 }
 void menuSensors(){
         int option;
@@ -175,15 +181,31 @@ void menuInspection(){
         actionMenuInspections(option);
 }
 
-void actionMenuLocations(int option, t_location **locations, t_location *location_selected){
+void actionMenuLocations(int option, t_location **locations, t_location **location_selected_pointer){
     switch(option){
             case 1:
                 t_location *new_location = createNewLocation();
                 insertNewLocationAtDatabase(locations, new_location);
                 break;
             case 2: 
+                {
                 listAllLocations(locations);
+                string location_id_typed;
+                printf("Digite o ID da planta: \n");
+                printf(":: \n");
+                fgets(location_id_typed, MAX_STRING_SIZE, stdin);
+                t_location *location_found;
+                location_found = (t_location*)malloc(sizeof(t_location));
+                formatStringRemoveEnter(location_id_typed);
+                location_found = findLocationById(locations, location_id_typed);
+                if(location_found == NULL){
+                    printf("Erro ao encontrar planta. \n");
+                    return;
+                }
+                printf("name: %s. \n", location_found->name);
+                selectLocation(location_found, location_selected_pointer);
                 break;
+                }
             case 3:
                 break;
             case 4:
@@ -203,7 +225,7 @@ void actionMenuLocations(int option, t_location **locations, t_location *locatio
             default: break;
         }
 }
-void actionMenuSectors(int option){
+void actionMenuSectors(int option, t_app_state *app_state){
         switch (option)
             {
             case 1:
@@ -212,7 +234,8 @@ void actionMenuSectors(int option){
                 break;
             case 3:
                 break;
-            case 0: 
+            case 0:
+                resetStateOfMenuSelectedPointers(LOCATION, app_state);
                 break;
             default:
                 break;
@@ -274,7 +297,7 @@ t_location *createNewLocation(){
     t_location *new_location = NULL;
     new_location = (t_location*)malloc(sizeof(t_location));
     string unique_id; 
-    generateUniqueId(unique_id, 0);
+    generateUniqueId(unique_id, LOCATION);
     strcpy(new_location->id, unique_id);
     
     printf("- Digite o nome: \n");
@@ -286,26 +309,66 @@ t_location *createNewLocation(){
     printf("Nova planta foi cadastrada com sucesso. \n");
     return new_location;
 };
-void insertNewLocationAtDatabase(t_location **list,  t_location *new_location){
-    if(list == NULL){
+void insertNewLocationAtDatabase(t_location **list_locations,  t_location *new_location){
+    if(list_locations == NULL){
         new_location->next = NULL;
     } else {
-        new_location->next = *list;
+        new_location->next = *list_locations;
     } 
-    *list = new_location;
+    *list_locations = new_location;
     printf("Nova planta foi inserida com sucesso. \n");
 }
-void listAllLocations(t_location **list_location){
-    t_location *copy_list_location = *list_location;
+void listAllLocations(t_location **list_locations){
+    t_location *copy_list_location = *list_locations;
     int counter = 0;
     while(copy_list_location != NULL){
-        printf("[IDX: %i]\n-> [ID: %s, Nome: %s]. \n", counter, copy_list_location->id, copy_list_location->name);
+        printf("[ID: %s, Nome: %s]. \n", copy_list_location->id, copy_list_location->name);
         copy_list_location = copy_list_location->next;
         counter++;
     }
     printf("\n\nTotal de plantas encontradas no sistema: %i.\n\n", counter);
 }
+void selectLocation(t_location *location, t_location **location_selected_pointer){
+    *location_selected_pointer = location; 
+};
+t_location *findLocationById(t_location **list_locations, string location_id){
+    t_location *copy_list_location = *list_locations;
+    while(copy_list_location != NULL && strcmp(copy_list_location->id, location_id) != 0){
+        copy_list_location = copy_list_location->next;
+    }
+    return copy_list_location ? copy_list_location : NULL;;
+}
 
+void resetStateOfMenuSelectedPointers(t_entities entity_type, t_app_state *state){
+    switch(entity_type){
+        case LOCATION:
+                {
+                state->location_selected_pointer = NULL;
+                state->sector_selected_pointer = NULL;
+                state->sensor_selected_pointer = NULL;
+                state->inspection_selected_pointer = NULL;
+                break;
+                }
+        case SECTOR:
+                {
+                state->sector_selected_pointer = NULL;
+                state->sensor_selected_pointer = NULL;
+                state->inspection_selected_pointer = NULL;
+                break;
+                }
+        case SENSOR:
+                {
+                state->sensor_selected_pointer = NULL;
+                state->inspection_selected_pointer = NULL;
+                break;
+                }
+        case INSPECTION:
+                {
+                state->inspection_selected_pointer = NULL;
+                break;
+                }
+    }
+};
 void generateUniqueId(char* buffer, t_entities entity_type){
     t_string struct_sensor_type_string = mapEntityToString(entity_type);
     snprintf(buffer, 1000, "id_%.100s_%li_%i", struct_sensor_type_string.response, time(NULL), rand());
