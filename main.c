@@ -39,7 +39,7 @@ typedef struct datetime {
 
 typedef struct inspection t_inspection;
 struct inspection {
-    int id;
+    string id;
     int sensor_id;
     float value;
     time_t date_inspection;
@@ -48,7 +48,7 @@ struct inspection {
 
 typedef struct sensor t_sensor;
 struct sensor {
-    int id;
+    string id;
     int sector_id;
     string name;
     t_sensor_types sensor_type;
@@ -61,7 +61,7 @@ struct sensor {
 
 typedef struct sector t_sector;
 struct sector {
-    int id;
+    string id;
     int location_id;
     string name;
     string description;
@@ -72,20 +72,17 @@ struct sector {
 
 typedef struct location t_location;
 struct location {
-    int id;
+    string id;
     string name;
     t_sector *sectors;
     int sectors_quantity;
     t_location *next;
 };
 
-typedef struct mapSensorTypeToStringResponse {
+typedef struct stringAsStructResponse {
     string response;
-} t_mapSensorTypeToStringResponse;
+} t_string;
 
-typedef struct mapSensorTypeUnitToStringResponse {
-    string response;
-} t_mapSensorTypeUnitToStringResponse;
 
 void menuLocations(void);
 void menuSectors(void);
@@ -93,33 +90,23 @@ void menuSensors(void);
 void actionMenuLocations(int option);
 void actionMenuSectors(int option);
 void actionMenuSensors(int option);
-void actionMenuSensorsInspection(int option);
+void actionMenuInspections(int option);
 
-t_mapSensorTypeToStringResponse mapSensorTypeToString(int sensor_type_enum){
-    t_mapSensorTypeToStringResponse object;
-    string SENSOR_TYPES_STRING_MAPPED[] = {"TEMPERATURE", "VIBRATION", "PRESSURE", "CURRENT", "HUMIDITY"};
-    strcpy(object.response, SENSOR_TYPES_STRING_MAPPED[sensor_type_enum]);
-    return object;
-}
+void shutdownProgram();
+void generateUniqueId(string buffer, string seed);
+void formatStringRemoveEnter(string str);
+void formatStringToUppercase(string str);
+void formatStringToSystemPattern(string str);
 
-t_mapSensorTypeUnitToStringResponse mapSensorTypeUnitToString(int sensor_type_unit_enum){
-    t_mapSensorTypeUnitToStringResponse object;
-    string SENSOR_TYPES_UNIT_STRING_MAPPED[] = {"°C", "mm/s", "PSI", "A", "%"};    
-    strcpy(object.response, SENSOR_TYPES_UNIT_STRING_MAPPED[sensor_type_unit_enum]);
-    return object;
-}
+t_sector *createNewLocation();
 
 int main(){
-    bool is_program_running = true;
+    t_location *locations;
     int *location_selected_idx = NULL;
     int *sector_selected_idx = NULL;
     int *sensor_selected_idx = NULL;
     int *inspection_selected_idx = NULL;
-    srand(time(NULL));
     for(;;){
-        if(!is_program_running){
-            return 0;
-        }
         if(
             location_selected_idx != NULL &&
             sector_selected_idx != NULL
@@ -138,22 +125,16 @@ int main(){
 
 void menuLocations(){
         int option;
+        printf("Bem-vindo 👋. \n");
         printf("Escolha uma opção: \n");
-        printf("1. Criar planta: \n");
-        printf("2. Listar todas plantas: \n");
-        printf("3. Selecionar planta: \n");
-        printf("4. Gerar relatorio de sensores\n");
-        printf("5. Gerar relatório de leituras\n");
-        printf("6. Gerar relatório de setores\n");
-        printf("7. Pesquisar sensor por tipo\n");
-        printf("8. Pesquisar setor por descrição\n");
-        printf("9. Relatório de médias de leitura por sensor\n");
-        printf("10. Relatório de variação de leitura\n");
+        printf("1. Criar Planta \n");
+        printf("2. Selecionar Planta \n");
         printf("0. Fechar (Sair do programa):. \n");
+        printf(":: \n");
         scanf("%i", &option);
         getchar();
         if(option == 0){
-            //is_program_running = false;
+            shutdownProgram();
             return;
         }
         actionMenuLocations(option);
@@ -188,7 +169,7 @@ void menuInspection(){
         printf("0. Voltar. \n");
         scanf("%i", &option);
         getchar();
-        actionMenuSensorsInspection(option);
+        actionMenuInspections(option);
 }
 
 void actionMenuLocations(int option){
@@ -246,7 +227,7 @@ void actionMenuSensors(int option){
                 break;
         }
 }
-void actionMenuSensorsInspection(int option){
+void actionMenuInspections(int option){
     switch (option)
         {  
             case 1:
@@ -259,4 +240,51 @@ void actionMenuSensorsInspection(int option){
                 break;
         }
 }
- 
+void shutdownProgram(){
+    printf("Encerrando operação. Até logo 👋\n ");
+    exit(0);
+}
+
+t_string mapSensorTypeToString(int sensor_type_enum){
+    t_string object;
+    string SENSOR_TYPES_STRING_MAPPED[] = {"TEMPERATURE", "VIBRATION", "PRESSURE", "CURRENT", "HUMIDITY"};
+    strcpy(object.response, SENSOR_TYPES_STRING_MAPPED[sensor_type_enum]);
+    return object;
+}
+t_string mapSensorTypeUnitToString(int sensor_type_unit_enum){
+    t_string object;
+    string SENSOR_TYPES_UNIT_STRING_MAPPED[] = {"°C", "mm/s", "PSI", "A", "%"};    
+    strcpy(object.response, SENSOR_TYPES_UNIT_STRING_MAPPED[sensor_type_unit_enum]);
+    return object;
+}
+t_sector *createNewLocation(t_location *selected_location){
+    t_location *new_location = NULL;
+    string unique_id; 
+    generateUniqueId(unique_id, "LOCATION");
+    strcpy(new_location->id, unique_id);
+    
+    printf("- Digite o nome: \n");
+    fgets(new_location->name, MAX_STRING_SIZE, stdin);
+    formatStringToSystemPattern(new_location->name);
+
+    new_location->sectors_quantity = 0;
+    
+    printf("Nova planta foi cadastrada com sucesso. \n");
+    return new_location;
+};
+void generateUniqueId(string buffer, string name_seed){
+    snprintf(buffer, 100, "id_%s_%ld_%d", name_seed, time(NULL), rand());
+}
+void formatStringRemoveEnter(string str){
+    if(strlen(str) < 1) return;
+    str[strlen(str) - 1] = '\0';
+}
+void formatStringToUppercase(string str){
+    for(int i = 0; str[i] != '\0'; i++){
+        str[i] = toupper(str[i]);
+    }
+}
+void formatStringToSystemPattern(string str){
+    formatStringRemoveEnter(str);
+    formatStringToUppercase(str);
+}
