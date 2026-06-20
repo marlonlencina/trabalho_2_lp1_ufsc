@@ -93,27 +93,59 @@ typedef struct appState {
 
 void menuLocations(t_app_state *app_state);
 void menuSectors(t_app_state *app_state);
-void menuSensors(void);
+void menuSensors(t_app_state *app_state);
+void menuInspections(t_app_state *app_state);
 void actionMenuLocations(int option, t_app_state *app_state);
 void actionMenuSectors(int option, t_app_state *app_state);
-void actionMenuSensors(int option);
-void actionMenuInspections(int option);
+void actionMenuSensors(int option, t_app_state *app_state);
+void actionMenuInspections(int option, t_app_state *app_state);
 void resetStateOfMenuSelectedPointers(t_entities entity_type, t_app_state *state);
 void shutdownProgram();
+
+t_location *createNewLocation();
+void insertNewLocationAtDatabase(t_location **list_locations,  t_location *new_location);
+void deleteLocationAtDatabase(t_location **list_locations, string location_id);
+void listAllLocations(t_location *list_locations);
+void selectLocation(t_location *location, t_location **location_selected);
+t_location *findLocationById(t_location **list_locations, string location_id);
+t_location *findLocationByIdx(t_location *list, int idx);
+t_location *promptAndFindLocationByIdx(t_location *list_locations);
+
+t_sector *createNewSector(t_location *location_selected_pointer);
+void insertNewSectorAtDatabase(t_sector **list_sectors, t_sector *new_sector);
+void deleteSectorAtDatabase(t_sector **list_sectors, string sector_id);
+void listAllSectors(t_sector *list_sectors);
+void selectSector(t_sector *sector, t_sector **sector_selected_pointer);
+t_sector *findSectorById(t_sector *list_sectors, string sector_id);
+t_sector *findSectorByIdx(t_sector *list_sectors, int idx);
+t_sector *promptAndFindSectorByIdx(t_sector *list_sectors);
+
+t_sensor *createNewSensor(t_sector *sector_selected_pointer);
+void insertNewSensorAtDatabase(t_sensor **list_sensors, t_sensor *new_sensor);
+void deleteSensorAtDatabase(t_sensor **list_sensors, string sensor_id);
+void listAllSensors(t_sensor *list_sensors);
+void selectSensor(t_sensor *sensor, t_sensor **sensor_selected_pointer);
+t_sensor *findSensorById(t_sensor *list_sensor, string sensor_id);
+t_sensor *findSensorByIdx(t_sensor *list_sensor, int idx);
+t_sensor *promptAndFindSensorByIdx(t_sensor *list_sensors);
+
+t_inspection *createNewInspection(t_sensor *sensor_selected_pointer);
+void insertNewInspectionAtDatabase(t_inspection **list_inspections, t_inspection *new_inspection);
+void deleteInspectionAtDatabase(t_inspection **list_inspections, string inspection_id);
+void listAllInspections(t_inspection *list_inspections);
+void selectInspection(t_inspection *inspection, t_inspection **inspection_selected_pointer);
+t_inspection *findInspectionById(t_inspection *list_inspections, string inspection_id);
+t_inspection *findInspectionByIdx(t_inspection *list_inspections, int idx);
+t_inspection *promptAndFindInspectionByIdx(t_inspection *list_inspections);
 
 void generateUniqueId(char* buffer, t_entities entity_type);
 void formatStringRemoveEnter(string str);
 void formatStringToUppercase(string str);
 void formatStringToSystemPattern(string str);
-
-t_location *createNewLocation();
-void listAllLocations(t_location *list_locations);
-void insertNewLocationAtDatabase(t_location **list_locations,  t_location *new_location);
-void selectLocation(t_location *location, t_location **location_selected);
-t_location *findLocationById(t_location **list_locations, string location_id);
-void deleteLocationAtDatabase(t_location **list_locations, string location_id);
-t_location *findLocationByIdx(t_location *list, int idx);
-t_location *promptAndFindLocationByIdx(t_location *list_locations);
+t_string mapSensorTypeToString(int sensor_type_enum);
+t_string mapSensorTypeUnitToString(int sensor_type_unit_enum);
+t_string mapEntityToString(int entity);
+t_string mapTimestampToString(time_t timestamp, bool enable_hours);
 
 int main(){
     srand(time(NULL));
@@ -121,9 +153,16 @@ int main(){
     for(;;){
         if(
             app_state.location_selected_pointer != NULL &&
+            app_state.sector_selected_pointer != NULL &&
+            app_state.sensor_selected_pointer != NULL
+        ){
+            menuInspections(&app_state);
+        }
+        else if(
+            app_state.location_selected_pointer != NULL &&
             app_state.sector_selected_pointer != NULL
         ){
-            menuSensors();
+            menuSensors(&app_state);
         } else if(
             app_state.location_selected_pointer != NULL
         ){
@@ -155,26 +194,26 @@ void menuLocations(t_app_state *appState){
 void menuSectors(t_app_state *app_state){
         int option;
         printf("Escolha uma opção: \n");
-        printf("1. Criar setor. \n");
-        printf("2. Listar todos Setores. \n");
-        printf("3. Selecionar setor. \n");
+        printf("1. Criar Setor. \n");
+        printf("2. Selecionar Setor. \n");
+        printf("3. Deletar Setor. \n");
         printf("0. Voltar. \n");
         scanf("%i", &option);
         getchar();
         actionMenuSectors(option, app_state);
 }
-void menuSensors(){
+void menuSensors(t_app_state *app_state){
         int option;
-        printf(" Escolha uma opção: ");
-        printf("1. Criar sensor. \n");
-        printf("2. Listar sensores. \n");
-        printf("3. Selecionar sensor. \n");
+        printf("Escolha uma opção: \n");
+        printf("1. Criar Sensor. \n");
+        printf("2. Selecionar Sensor. \n");
+        printf("3. Deletar Sensor. \n");
         printf("0. Voltar. \n");
         scanf("%i", &option);
         getchar();
-        actionMenuSensors(option);
+        actionMenuSensors(option, app_state);
 }
-void menuInspection(){
+void menuInspections(t_app_state *app_state){
         int option;
         printf("Escolha uma opção: \n");
         printf("1. Gerar leitura no sensor. \n");
@@ -182,7 +221,7 @@ void menuInspection(){
         printf("0. Voltar. \n");
         scanf("%i", &option);
         getchar();
-        actionMenuInspections(option);
+        actionMenuInspections(option, app_state);
 }
 void actionMenuLocations(int option, t_app_state *app_state){
     switch(option){
@@ -197,7 +236,7 @@ void actionMenuLocations(int option, t_app_state *app_state){
                 break;
                 }
             case 3:
-            {
+                {
                 t_location *location_found = promptAndFindLocationByIdx(app_state->database);
                 deleteLocationAtDatabase(&app_state->database, location_found->id);
                 break;
@@ -223,11 +262,21 @@ void actionMenuSectors(int option, t_app_state *app_state){
         switch (option)
             {
             case 1:
+                t_sector *new_sector = createNewSector(app_state->location_selected_pointer);
+                insertNewSectorAtDatabase(&app_state->location_selected_pointer->sectors, new_sector);
                 break;
-            case 2:
+            case 2: 
+                {
+                t_sector *sector_found = promptAndFindSectorByIdx(app_state->location_selected_pointer->sectors);
+                selectSector(sector_found, &app_state->sector_selected_pointer);
                 break;
+                }
             case 3:
+                {
+                t_sector *sector_found = promptAndFindSectorByIdx(app_state->location_selected_pointer->sectors);
+                deleteSectorAtDatabase(&app_state->location_selected_pointer->sectors, sector_found->id);
                 break;
+                }
             case 0:
                 resetStateOfMenuSelectedPointers(LOCATION, app_state);
                 break;
@@ -235,34 +284,50 @@ void actionMenuSectors(int option, t_app_state *app_state){
                 break;
         }
 }
-void actionMenuSensors(int option){
+void actionMenuSensors(int option, t_app_state *app_state){
     switch (option)
         {
             case 1:
+                t_sensor *new_sensor = createNewSensor(app_state->sector_selected_pointer);
+                insertNewSensorAtDatabase(&app_state->sector_selected_pointer->sensors, new_sensor);
                 break;
-            case 2:
+            case 2: 
+                {
+                t_sensor *sensor_found = promptAndFindSensorByIdx(app_state->sector_selected_pointer->sensors);
+                selectSensor(sensor_found, &app_state->sensor_selected_pointer);
                 break;
+                }
             case 3:
+                {
+                t_sensor *sensor_found = promptAndFindSensorByIdx(app_state->sector_selected_pointer->sensors);
+                deleteSensorAtDatabase(&app_state->sector_selected_pointer->sensors, sensor_found->id);
                 break;
-            case 0: 
+                }
+            case 0:
+                resetStateOfMenuSelectedPointers(SECTOR, app_state);
                 break;
             default:
                 break;
         }
 }
-void actionMenuInspections(int option){
+void actionMenuInspections(int option, t_app_state *app_state){
     switch (option)
         {  
             case 1:
+                t_inspection *new_inspection = createNewInspection(app_state->sensor_selected_pointer);
+                insertNewInspectionAtDatabase(&app_state->sensor_selected_pointer->inspections, new_inspection);
                 break;
             case 2:
+                listAllInspections(app_state->sensor_selected_pointer->inspections);
                 break;
             case 0: 
+                resetStateOfMenuSelectedPointers(SENSOR, app_state);
                 break;
             default:
                 break;
         }
 }
+
 void resetStateOfMenuSelectedPointers(t_entities entity_type, t_app_state *state){
     switch(entity_type){
         case LOCATION:
@@ -314,6 +379,18 @@ t_string mapEntityToString(int entity){
     t_string object;
     string ENTITIES_TYPES[] = {"LOCATION", "SECTOR", "SENSOR", "INSPECTION"};    
     strcpy(object.response, ENTITIES_TYPES[entity]);
+    return object;
+}
+t_string mapTimestampToString(time_t timestamp, bool enable_hours){
+    t_string object;
+    struct tm* tm_info = localtime(&timestamp);
+    char date_str[50];
+    if(enable_hours){
+        strftime(date_str, sizeof(date_str), "%d/%m/%Y %H:%M:%S", tm_info);
+    } else {
+        strftime(date_str, sizeof(date_str), "%d/%m/%Y", tm_info);
+    }
+    strcpy(object.response, date_str);
     return object;
 }
 
@@ -381,9 +458,14 @@ void deleteLocationAtDatabase(t_location **list_locations, string location_id){
 void listAllLocations(t_location *list_locations){
     int initial_idx = 1;
     int counter = 0;
-
+    printf("\n\n");
     while(list_locations != NULL){
-        printf("[IDX: %i] -> [ID: %s, Nome: %s]. \n", initial_idx, list_locations->id, list_locations->name);
+        printf("[IDX:  %i] -> [ID: %s, Nome: %s, Total de setores: %i]. \n",
+        initial_idx,
+        list_locations->id,
+        list_locations->name,
+        list_locations->sectors_quantity);
+
         list_locations = list_locations->next;
         counter++, initial_idx++;
     }
@@ -420,6 +502,389 @@ t_location *promptAndFindLocationByIdx(t_location *list_locations){
     }
     return location_found;
 }
+
+t_sector *createNewSector(t_location *location_selected_pointer){
+    t_sector *new_sector = NULL;
+    new_sector = (t_sector*)malloc(sizeof(t_sector));
+    string unique_id; 
+    generateUniqueId(unique_id, SECTOR);
+    strcpy(new_sector->id, unique_id);
+    
+    printf("Digite o nome: \n");
+    fgets(new_sector->name, MAX_STRING_SIZE, stdin);
+    formatStringToSystemPattern(new_sector->name);
+
+    printf("Digite a descrição: \n");
+    fgets(new_sector->description, MAX_STRING_SIZE, stdin);
+    formatStringToSystemPattern(new_sector->description);
+
+    new_sector->sensors_quantity = 0;
+    strcpy(new_sector->location_id, location_selected_pointer->id);
+
+    printf("Novo setor foi cadastrado com sucesso. \n");
+    return new_sector;
+};
+void insertNewSectorAtDatabase(t_sector **list_sectors,  t_sector *new_sector){
+    if(list_sectors == NULL){
+        new_sector->next = NULL;
+    } else {
+        new_sector->next = *list_sectors;
+    } 
+    *list_sectors = new_sector;
+    printf("Novo setor foi inserido com sucesso. \n");
+}
+void deleteSectorAtDatabase(t_sector **list_sectors, string sector_id){
+    if(*list_sectors == NULL){
+        printf("Não existem setores. \n");
+        return;
+    }
+
+    t_sector *current_location = *list_sectors;
+    t_sector *temp;
+
+    t_sector *sector_to_delete = findSectorById(*list_sectors, sector_id);
+
+    if(sector_to_delete == NULL){
+        printf("Erro ao deletar setor -> Setor não encontrado. \n");
+        return;
+    }
+
+    //primeiro nó
+    if(current_location == sector_to_delete){
+        *list_sectors = current_location->next;
+        free(current_location);
+        printf("Setor deletad0 com sucesso. \n");
+        return;
+    }
+    
+    //nao é o primero nó, encontra o anterior
+    while(current_location->next != NULL && current_location->next != sector_to_delete){
+        current_location = current_location->next;
+    }
+
+    if(current_location->next != NULL){
+        temp = current_location->next;
+        current_location->next = temp->next;
+        free(temp);
+    }
+
+};
+t_sector *findSectorById(t_sector *list_sectors, string sector_id){
+    t_sector *copy_list_sensors = list_sectors;
+
+    while(copy_list_sensors != NULL && strcmp(copy_list_sensors->id, sector_id) != 0){
+        copy_list_sensors = copy_list_sensors->next;
+    }
+    return copy_list_sensors;
+}
+t_sector *findSectorByIdx(t_sector *list_sectors, int idx){
+    t_sector *copy_list_sectors = list_sectors;
+
+    int initial_idx = 1;
+    while(list_sectors != NULL){
+        if(initial_idx == idx) return copy_list_sectors;
+        copy_list_sectors = copy_list_sectors->next;
+        initial_idx++;
+    }
+    return NULL;
+}
+void listAllSectors(t_sector *list_sectors){
+    int initial_idx = 1;
+    int counter = 0;
+    printf("\n\n");
+    while(list_sectors != NULL){
+        printf("[IDX:  %i] -> [ID: %s, Nome: %s, Total de sensores: %i]. \n",
+        initial_idx,
+        list_sectors->id,
+        list_sectors->name,
+        list_sectors->sensors_quantity);
+
+        list_sectors = list_sectors->next;
+        counter++, initial_idx++;
+    }
+    printf("\n\nTotal de setores encontrados no sistema: %i.\n\n", counter);
+}
+t_sector *promptAndFindSectorByIdx(t_sector *list_sectors){
+    listAllSectors(list_sectors);
+    int sector_idx;
+    printf("Digite o índice do setor: \n");
+    printf(":: \n");
+    scanf("%i", &sector_idx);
+    t_sector *sector_found = findSectorByIdx(list_sectors, sector_idx);
+    if(sector_found == NULL){
+        printf("Erro ao encontrar setor. \n");
+    }
+    return sector_found;
+}
+void selectSector(t_sector *sector, t_sector **sector_selected_pointer){
+    *sector_selected_pointer = sector; 
+};
+
+t_sensor *createNewSensor(t_sector *sector_selected_pointer){
+    t_sensor *new_sensor = NULL;
+    new_sensor = (t_sensor*)malloc(sizeof(t_sensor));
+    string unique_id; 
+    generateUniqueId(unique_id, SENSOR);
+    strcpy(new_sensor->id, unique_id);
+    
+    printf("Digite o nome: \n");
+    fgets(new_sensor->name, MAX_STRING_SIZE, stdin);
+    formatStringToSystemPattern(new_sensor->name);
+
+    new_sensor->inspections_quantity = 0;
+    strcpy(new_sensor->sector_id, sector_selected_pointer->id);
+
+    printf("Digite o número correspondente ao tipo de sensor: \n");
+    printf("0. TEMPERATURA - °C \n");
+    printf("1. VIBRAÇÃO - mm/s \n");
+    printf("2. PRESSÃO - PSI \n");
+    printf("3. CORRENTE - A\n");
+    printf("4. UMIDADE - %% \n");
+    int number_typed;
+    scanf("%i", &number_typed);
+    getchar();
+
+    int is_number_typed_valid = number_typed == 0 || number_typed == 1 || number_typed == 2 || number_typed == 3 || number_typed == 4;
+
+    if(!is_number_typed_valid){
+        printf("Erro: você não digitou um número válido para o tipo do sensor. \n");
+        return NULL;
+    }
+
+    new_sensor->sensor_type = number_typed;
+
+    printf("Digite o range mínimo do sensor: \n");
+    scanf("%f", &new_sensor->range_min); 
+    getchar();
+    printf("Digite o range máximo do sensor: \n");
+    scanf("%f", &new_sensor->range_max); 
+    getchar();
+
+    printf("Novo sensor foi cadastrado com sucesso. \n");
+    return new_sensor;
+};
+void insertNewSensorAtDatabase(t_sensor **list_sensors,  t_sensor *new_sensor){
+    if(list_sensors == NULL){
+        new_sensor->next = NULL;
+    } else {
+        new_sensor->next = *list_sensors;
+    } 
+    *list_sensors = new_sensor;
+    printf("Novo sensor foi inserido com sucesso. \n");
+}
+void deleteSensorAtDatabase(t_sensor **list_sensors, string sensor_id){
+    if(*list_sensors == NULL){
+        printf("Não existem sensores. \n");
+        return;
+    }
+
+    t_sensor *current_location = *list_sensors;
+    t_sensor *temp;
+
+    t_sensor *sensor_to_delete = findSensorById(*list_sensors, sensor_id);
+
+    if(sensor_to_delete == NULL){
+        printf("Erro ao deletar sensor -> Sensor não encontrado. \n");
+        return;
+    }
+
+    //primeiro nó
+    if(current_location == sensor_to_delete){
+        *list_sensors = current_location->next;
+        free(current_location);
+        printf("Sensor deletado com sucesso. \n");
+        return;
+    }
+    
+    //nao é o primero nó, encontra o anterior
+    while(current_location->next != NULL && current_location->next != sensor_to_delete){
+        current_location = current_location->next;
+    }
+
+    if(current_location->next != NULL){
+        temp = current_location->next;
+        current_location->next = temp->next;
+        free(temp);
+    }
+
+};
+t_sensor *findSensorById(t_sensor *list_sensors, string sensor_id){
+    t_sensor *copy_list_sensors = list_sensors;
+
+    while(copy_list_sensors != NULL && strcmp(copy_list_sensors->id, sensor_id) != 0){
+        copy_list_sensors = copy_list_sensors->next;
+    }
+    return copy_list_sensors;
+}
+t_sensor *findSensorByIdx(t_sensor *list_sensors, int idx){
+    t_sensor *copy_list_sensors = list_sensors;
+
+    int initial_idx = 1;
+    while(copy_list_sensors != NULL){
+        if(initial_idx == idx) return copy_list_sensors;
+        copy_list_sensors = copy_list_sensors->next;
+        initial_idx++;
+    }
+    return NULL;
+}
+void listAllSensors(t_sensor *list_sensors){
+    int initial_idx = 1;
+    int counter = 0;
+    printf("\n\n");
+    while(list_sensors != NULL){
+        printf("[IDX:  %i] -> [ID: %s, Nome: %s, Total de inspeções: %i]. \n",
+        initial_idx,
+        list_sensors->id,
+        list_sensors->name,
+        list_sensors->inspections_quantity);
+
+        list_sensors = list_sensors->next;
+        counter++, initial_idx++;
+    }
+    printf("\n\nTotal de sensores encontrados no sistema: %i.\n\n", counter);
+}
+t_sensor *promptAndFindSensorByIdx(t_sensor *list_sensors){
+    listAllSensors(list_sensors);
+    int sensor_idx;
+    printf("Digite o índice do sensor: \n");
+    printf(":: \n");
+    scanf("%i", &sensor_idx);
+    t_sensor *sensor_found = findSensorByIdx(list_sensors, sensor_idx);
+    if(sensor_found == NULL){
+        printf("Erro ao encontrar sensor. \n");
+    }
+    return sensor_found;
+}
+void selectSensor(t_sensor *sensor, t_sensor **sensor_selected_pointer){
+    *sensor_selected_pointer = sensor; 
+};
+
+t_inspection *createNewInspection(t_sensor *sensor_selected_pointer){
+    t_inspection *new_inspection = NULL;
+    new_inspection = (t_inspection*)malloc(sizeof(t_inspection));
+    string unique_id; 
+    generateUniqueId(unique_id, SENSOR);
+    strcpy(new_inspection->id, unique_id);
+
+    time_t date;
+    time(&date); 
+    new_inspection->date_inspection = date;
+
+    printf("Digite o valor da leitura (%.2f-%.2f): \n", sensor_selected_pointer->range_min, sensor_selected_pointer->range_max);
+    scanf("%f", &new_inspection->value);
+ 
+    if(
+    new_inspection->value < sensor_selected_pointer->range_min ||
+    new_inspection->value > sensor_selected_pointer->range_max
+    ){
+        printf("- Range mínimo (%.2f) e o Range máximo (%.2f).\n", 
+            sensor_selected_pointer->range_min,
+            sensor_selected_pointer->range_max);
+ 
+        printf("Erro: Você precisa gerar um valor entre o Range mínimo e o range máximo. \n");
+        new_inspection = NULL;
+        return new_inspection;
+    }
+
+    printf("Nova leitura foi cadastrada com sucesso. \n");
+    return new_inspection;
+};
+void insertNewInspectionAtDatabase(t_inspection **list_inspections,  t_inspection *new_inspection){
+    if(list_inspections == NULL){
+        new_inspection->next = NULL;
+    } else {
+        new_inspection->next = *list_inspections;
+    } 
+    *list_inspections = new_inspection;
+    printf("Nova leitura foi inserido com sucesso. \n");
+}
+void deleteInspectionAtDatabase(t_inspection **list_inspections, string inspection_id){
+    if(*list_inspections == NULL){
+        printf("Não existem leituras. \n");
+        return;
+    }
+
+    t_inspection *current_location = *list_inspections;
+    t_inspection *temp;
+
+    t_inspection *inspection_to_delete = findInspectionById(*list_inspections, inspection_id);
+
+    if(inspection_to_delete == NULL){
+        printf("Erro ao deletar leitura -> Leitura não encontrada. \n");
+        return;
+    }
+
+    //primeiro nó
+    if(current_location == inspection_to_delete){
+        *list_inspections = current_location->next;
+        free(current_location);
+        printf("Leitura deletada com sucesso. \n");
+        return;
+    }
+    
+    //nao é o primero nó, encontra o anterior
+    while(current_location->next != NULL && current_location->next != inspection_to_delete){
+        current_location = current_location->next;
+    }
+
+    if(current_location->next != NULL){
+        temp = current_location->next;
+        current_location->next = temp->next;
+        free(temp);
+    }
+
+};
+t_inspection *findInspectionById(t_inspection *list_inspections, string inspection_id){
+    t_inspection *copy_list_sensors = list_inspections;
+
+    while(copy_list_sensors != NULL && strcmp(copy_list_sensors->id, inspection_id) != 0){
+        copy_list_sensors = copy_list_sensors->next;
+    }
+    return copy_list_sensors;
+}
+t_inspection *findInspectionByIdx(t_inspection *list_inspections, int idx){
+    t_inspection *copy_list_inspections = list_inspections;
+
+    int initial_idx = 1;
+    while(copy_list_inspections != NULL){
+        if(initial_idx == idx) return copy_list_inspections;
+        copy_list_inspections = copy_list_inspections->next;
+        initial_idx++;
+    }
+    return NULL;
+}
+void listAllInspections(t_inspection *list_inspections){
+    int initial_idx = 1;
+    int counter = 0;
+    printf("\n\n");
+    while(list_inspections != NULL){
+        printf("[IDX:  %i] -> [ID: %s, Valor: %.2f]. \n",
+        initial_idx,
+        list_inspections->id,
+        list_inspections->value);
+
+        list_inspections = list_inspections->next;
+        counter++, initial_idx++;
+    }
+    printf("\n\nTotal de plantas encontradas no sistema: %i.\n\n", counter);
+}
+t_inspection *promptAndFindInspectionByIdx(t_inspection *list_inspections){
+    listAllInspections(list_inspections);
+    int inspection_idx;
+    printf("Digite o índice da leitura: \n");
+    printf(":: \n");
+    scanf("%i", &inspection_idx);
+    t_inspection *inspection_found = findInspectionByIdx(list_inspections, inspection_idx);
+    if(inspection_found == NULL){
+        printf("Erro ao encontrar leitura. \n");
+    }
+    return inspection_found;
+}
+void selectInspection(t_inspection *inspection, t_inspection **inspection_selected_pointer){
+    *inspection_selected_pointer = inspection; 
+};
+
+
 
 void generateUniqueId(char* buffer, t_entities entity_type){
     t_string struct_sensor_type_string = mapEntityToString(entity_type);
