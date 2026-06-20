@@ -363,37 +363,6 @@ void shutdownProgram(){
     exit(0);
 }
 
-t_string mapSensorTypeToString(int sensor_type_enum){
-    t_string object;
-    string SENSOR_TYPES_STRING_MAPPED[] = {"TEMPERATURE", "VIBRATION", "PRESSURE", "CURRENT", "HUMIDITY"};
-    strcpy(object.response, SENSOR_TYPES_STRING_MAPPED[sensor_type_enum]);
-    return object;
-}
-t_string mapSensorTypeUnitToString(int sensor_type_unit_enum){
-    t_string object;
-    string SENSOR_TYPES_UNIT_STRING_MAPPED[] = {"°C", "mm/s", "PSI", "A", "%"};    
-    strcpy(object.response, SENSOR_TYPES_UNIT_STRING_MAPPED[sensor_type_unit_enum]);
-    return object;
-}
-t_string mapEntityToString(int entity){
-    t_string object;
-    string ENTITIES_TYPES[] = {"LOCATION", "SECTOR", "SENSOR", "INSPECTION"};    
-    strcpy(object.response, ENTITIES_TYPES[entity]);
-    return object;
-}
-t_string mapTimestampToString(time_t timestamp, bool enable_hours){
-    t_string object;
-    struct tm* tm_info = localtime(&timestamp);
-    char date_str[50];
-    if(enable_hours){
-        strftime(date_str, sizeof(date_str), "%d/%m/%Y %H:%M:%S", tm_info);
-    } else {
-        strftime(date_str, sizeof(date_str), "%d/%m/%Y", tm_info);
-    }
-    strcpy(object.response, date_str);
-    return object;
-}
-
 t_location *createNewLocation(){
     t_location *new_location = NULL;
     new_location = (t_location*)malloc(sizeof(t_location));
@@ -569,6 +538,25 @@ void deleteSectorAtDatabase(t_sector **list_sectors, string sector_id){
     }
 
 };
+void listAllSectors(t_sector *list_sectors){
+    int initial_idx = 1;
+    int counter = 0;
+    printf("\n\n");
+    while(list_sectors != NULL){
+        printf("[IDX:  %i] -> [ID: %s, Nome: %s, Total de sensores: %i]. \n",
+        initial_idx,
+        list_sectors->id,
+        list_sectors->name,
+        list_sectors->sensors_quantity);
+
+        list_sectors = list_sectors->next;
+        counter++, initial_idx++;
+    }
+    printf("\n\nTotal de setores encontrados no sistema: %i.\n\n", counter);
+}
+void selectSector(t_sector *sector, t_sector **sector_selected_pointer){
+    *sector_selected_pointer = sector; 
+};
 t_sector *findSectorById(t_sector *list_sectors, string sector_id){
     t_sector *copy_list_sensors = list_sectors;
 
@@ -588,22 +576,6 @@ t_sector *findSectorByIdx(t_sector *list_sectors, int idx){
     }
     return NULL;
 }
-void listAllSectors(t_sector *list_sectors){
-    int initial_idx = 1;
-    int counter = 0;
-    printf("\n\n");
-    while(list_sectors != NULL){
-        printf("[IDX:  %i] -> [ID: %s, Nome: %s, Total de sensores: %i]. \n",
-        initial_idx,
-        list_sectors->id,
-        list_sectors->name,
-        list_sectors->sensors_quantity);
-
-        list_sectors = list_sectors->next;
-        counter++, initial_idx++;
-    }
-    printf("\n\nTotal de setores encontrados no sistema: %i.\n\n", counter);
-}
 t_sector *promptAndFindSectorByIdx(t_sector *list_sectors){
     listAllSectors(list_sectors);
     int sector_idx;
@@ -616,9 +588,6 @@ t_sector *promptAndFindSectorByIdx(t_sector *list_sectors){
     }
     return sector_found;
 }
-void selectSector(t_sector *sector, t_sector **sector_selected_pointer){
-    *sector_selected_pointer = sector; 
-};
 
 t_sensor *createNewSensor(t_sector *sector_selected_pointer){
     t_sensor *new_sensor = NULL;
@@ -708,6 +677,25 @@ void deleteSensorAtDatabase(t_sensor **list_sensors, string sensor_id){
     }
 
 };
+void listAllSensors(t_sensor *list_sensors){
+    int initial_idx = 1;
+    int counter = 0;
+    printf("\n\n");
+    while(list_sensors != NULL){
+        printf("[IDX:  %i] -> [ID: %s, Nome: %s, Total de inspeções: %i]. \n",
+        initial_idx,
+        list_sensors->id,
+        list_sensors->name,
+        list_sensors->inspections_quantity);
+
+        list_sensors = list_sensors->next;
+        counter++, initial_idx++;
+    }
+    printf("\n\nTotal de sensores encontrados no sistema: %i.\n\n", counter);
+}
+void selectSensor(t_sensor *sensor, t_sensor **sensor_selected_pointer){
+    *sensor_selected_pointer = sensor; 
+};
 t_sensor *findSensorById(t_sensor *list_sensors, string sensor_id){
     t_sensor *copy_list_sensors = list_sensors;
 
@@ -727,22 +715,6 @@ t_sensor *findSensorByIdx(t_sensor *list_sensors, int idx){
     }
     return NULL;
 }
-void listAllSensors(t_sensor *list_sensors){
-    int initial_idx = 1;
-    int counter = 0;
-    printf("\n\n");
-    while(list_sensors != NULL){
-        printf("[IDX:  %i] -> [ID: %s, Nome: %s, Total de inspeções: %i]. \n",
-        initial_idx,
-        list_sensors->id,
-        list_sensors->name,
-        list_sensors->inspections_quantity);
-
-        list_sensors = list_sensors->next;
-        counter++, initial_idx++;
-    }
-    printf("\n\nTotal de sensores encontrados no sistema: %i.\n\n", counter);
-}
 t_sensor *promptAndFindSensorByIdx(t_sensor *list_sensors){
     listAllSensors(list_sensors);
     int sensor_idx;
@@ -755,9 +727,6 @@ t_sensor *promptAndFindSensorByIdx(t_sensor *list_sensors){
     }
     return sensor_found;
 }
-void selectSensor(t_sensor *sensor, t_sensor **sensor_selected_pointer){
-    *sensor_selected_pointer = sensor; 
-};
 
 t_inspection *createNewInspection(t_sensor *sensor_selected_pointer){
     t_inspection *new_inspection = NULL;
@@ -834,6 +803,26 @@ void deleteInspectionAtDatabase(t_inspection **list_inspections, string inspecti
     }
 
 };
+void listAllInspections(t_inspection *list_inspections){
+    int initial_idx = 1;
+    int counter = 0;
+    printf("\n\n");
+    while(list_inspections != NULL){
+        printf("[IDX:  %i] -> [ID: %s, Valor: %.2f, Data: %s]. \n",
+        initial_idx,
+        list_inspections->id,
+        list_inspections->value,
+        mapTimestampToString(list_inspections->date_inspection, true).response
+        );
+
+        list_inspections = list_inspections->next;
+        counter++, initial_idx++;
+    }
+    printf("\n\nTotal de plantas encontradas no sistema: %i.\n\n", counter);
+}
+void selectInspection(t_inspection *inspection, t_inspection **inspection_selected_pointer){
+    *inspection_selected_pointer = inspection; 
+};
 t_inspection *findInspectionById(t_inspection *list_inspections, string inspection_id){
     t_inspection *copy_list_sensors = list_inspections;
 
@@ -853,21 +842,6 @@ t_inspection *findInspectionByIdx(t_inspection *list_inspections, int idx){
     }
     return NULL;
 }
-void listAllInspections(t_inspection *list_inspections){
-    int initial_idx = 1;
-    int counter = 0;
-    printf("\n\n");
-    while(list_inspections != NULL){
-        printf("[IDX:  %i] -> [ID: %s, Valor: %.2f]. \n",
-        initial_idx,
-        list_inspections->id,
-        list_inspections->value);
-
-        list_inspections = list_inspections->next;
-        counter++, initial_idx++;
-    }
-    printf("\n\nTotal de plantas encontradas no sistema: %i.\n\n", counter);
-}
 t_inspection *promptAndFindInspectionByIdx(t_inspection *list_inspections){
     listAllInspections(list_inspections);
     int inspection_idx;
@@ -880,11 +854,6 @@ t_inspection *promptAndFindInspectionByIdx(t_inspection *list_inspections){
     }
     return inspection_found;
 }
-void selectInspection(t_inspection *inspection, t_inspection **inspection_selected_pointer){
-    *inspection_selected_pointer = inspection; 
-};
-
-
 
 void generateUniqueId(char* buffer, t_entities entity_type){
     t_string struct_sensor_type_string = mapEntityToString(entity_type);
@@ -902,4 +871,35 @@ void formatStringToUppercase(string str){
 void formatStringToSystemPattern(string str){
     formatStringRemoveEnter(str);
     formatStringToUppercase(str);
+}
+
+t_string mapSensorTypeToString(int sensor_type_enum){
+    t_string object;
+    string SENSOR_TYPES_STRING_MAPPED[] = {"TEMPERATURE", "VIBRATION", "PRESSURE", "CURRENT", "HUMIDITY"};
+    strcpy(object.response, SENSOR_TYPES_STRING_MAPPED[sensor_type_enum]);
+    return object;
+}
+t_string mapSensorTypeUnitToString(int sensor_type_unit_enum){
+    t_string object;
+    string SENSOR_TYPES_UNIT_STRING_MAPPED[] = {"°C", "mm/s", "PSI", "A", "%"};    
+    strcpy(object.response, SENSOR_TYPES_UNIT_STRING_MAPPED[sensor_type_unit_enum]);
+    return object;
+}
+t_string mapEntityToString(int entity){
+    t_string object;
+    string ENTITIES_TYPES[] = {"LOCATION", "SECTOR", "SENSOR", "INSPECTION"};    
+    strcpy(object.response, ENTITIES_TYPES[entity]);
+    return object;
+}
+t_string mapTimestampToString(time_t timestamp, bool enable_hours){
+    t_string object;
+    struct tm* tm_info = localtime(&timestamp);
+    char date_str[50];
+    if(enable_hours){
+        strftime(date_str, sizeof(date_str), "%d/%m/%Y %H:%M:%S", tm_info);
+    } else {
+        strftime(date_str, sizeof(date_str), "%d/%m/%Y", tm_info);
+    }
+    strcpy(object.response, date_str);
+    return object;
 }
