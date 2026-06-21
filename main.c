@@ -4,8 +4,12 @@
 int main()
 {
     srand(time(NULL));
+    system("mkdir -p ./output/locations");
+    system("mkdir -p ./output/sectors");
+    system("mkdir -p ./output/sensors");
+    system("mkdir -p ./output/inspections");
 
-    t_app_state app_state = {0, .base_datasave_binary_filepath = "output/datasave_binary.txt"};
+    t_app_state app_state = {0, .base_datasave_binary_filename = "datasave_binary.txt"};
 
     readUserDataBinaryFile(&app_state);
 
@@ -32,7 +36,7 @@ int main()
     return 0;
 }
 
-void menuLocations(t_app_state *appState)
+void menuLocations(t_app_state *app_state)
 {
     int option;
     printf("\033[1m[Menu Inicial]\033[0m\n");
@@ -49,35 +53,106 @@ void menuLocations(t_app_state *appState)
     getchar();
     if (option == 0)
     {
+        saveUserDataOnBinaryFile(app_state);
         shutdownProgram();
-        saveUserDataOnBinaryFile(appState);
         return;
     }
-    actionMenuLocations(option, appState);
+    actionMenuLocations(option, app_state);
 }
 
+// Handler geral de salvamento/carregamento
 void readUserDataBinaryFile(t_app_state *app_state)
 {
-    FILE *file_datasave = NULL;
-    file_datasave = fopen(app_state->base_datasave_binary_filepath, "rb");
-    if (file_datasave)
-    {
-        //
-
-        fclose(file_datasave);
-    }
+    loadLocationsFromFile(app_state,
+                          getFilepathMatchEntity(LOCATION, app_state->base_datasave_binary_filename).response);
 };
 void saveUserDataOnBinaryFile(t_app_state *app_state)
 {
-    FILE *file_datasave = NULL;
-    file_datasave = fopen(app_state->base_datasave_binary_filepath, "wb");
-    if (file_datasave)
-    {
-        //
 
-        fclose(file_datasave);
-    }
+    t_string filepath_locations = getFilepathMatchEntity(LOCATION, app_state->base_datasave_binary_filename);
+    printf("Persistindo locations em: \"%s\" \n", filepath_locations.response);
+    saveLocationsToFile(app_state, filepath_locations.response);
 };
+t_string getFilepathMatchEntity(t_entities entity, string base_filepath)
+{
+    t_string object = {.response = ""};
+    switch (entity)
+    {
+    case LOCATION:
+        strcat(object.response, "./output/locations/");
+        strcat(object.response, base_filepath);
+        break;
+    case SECTOR:
+        strcat(object.response, "./output/sectors/");
+        strcat(object.response, base_filepath);
+        break;
+    case SENSOR:
+        strcat(object.response, "./output/sensors/");
+        strcat(object.response, base_filepath);
+        break;
+    case INSPECTION:
+        strcat(object.response, "./output/inspections/");
+        strcat(object.response, base_filepath);
+        break;
+    default:
+        strcat(object.response, "./output/");
+        strcat(object.response, base_filepath);
+        break;
+    }
+    return object;
+}
+// Salvamento e carregamento individual de cada entidadade
+void saveLocationsToFile(t_app_state *app_state, string filepath)
+{
+    FILE *file = NULL;
+    file = fopen(filepath, "wb");
+    if (file == NULL)
+    {
+        printf("[LOCATIONS] Erro durante persistência de dados. \n");
+        return;
+    }
+    t_location *current_location = app_state->database;
+    while (current_location != NULL)
+    {
+        t_location copy_current_location = *current_location;
+
+        copy_current_location.next = NULL;
+        copy_current_location.sectors = NULL;
+        fwrite(&copy_current_location, sizeof(t_location), 1, file);
+        current_location = current_location->next;
+
+    }
+
+    fclose(file);
+};
+void loadLocationsFromFile(t_app_state *app_state, string filepath)
+{
+    FILE *file = NULL;
+    file = fopen(filepath, "rb");
+    if (file == NULL)
+    {
+        printf("[LOCATIONS] Erro durante leitura de dados. \n");
+        return;
+    }
+
+    t_location record_location;
+    while (fread(&record_location, sizeof(t_location), 1, file) == 1)
+    {
+        t_location *new_location = (t_location *)malloc(sizeof(t_location));
+        if (new_location)
+        {
+            *new_location = record_location;
+            insertNewLocationAtDatabase(&app_state->database, new_location);
+        }
+    }
+    fclose(file);
+};
+void saveSectorsToFile() {};
+void loadSectorsFromFile() {};
+void saveSensorsToFile() {};
+void loadSensorsFromFile() {};
+void saveInspectionsToFile() {};
+void loadInspectionsFromFile() {};
 
 void menuSectors(t_app_state *app_state)
 {

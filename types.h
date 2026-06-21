@@ -86,5 +86,5 @@ typedef struct appState
     t_sector *sector_selected_pointer;
     t_sensor *sensor_selected_pointer;
     t_inspection *inspection_selected_pointer;
-    string base_datasave_binary_filepath;
+    string base_datasave_binary_filename;
 } t_app_state;

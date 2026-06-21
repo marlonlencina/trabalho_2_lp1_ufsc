@@ -29,6 +29,15 @@ void shutdownProgram();
 
 void readUserDataBinaryFile(t_app_state *app_state);
 void saveUserDataOnBinaryFile(t_app_state *app_state);
+t_string getFilepathMatchEntity(t_entities entity, string base_filepath);
+void saveLocationsToFile(t_app_state *app_state, string filepath);
+void loadLocationsFromFile(t_app_state *app_state, string filepath);
+void saveSectorsToFile();
+void loadSectorsFromFile();
+void saveSensorsToFile();
+void loadSensorsFromFile();
+void saveInspectionsToFile();
+void loadInspectionsFromFile();
 
 t_location *createNewLocation();
 void insertNewLocationAtDatabase(t_location **list_locations, t_location *new_location);
