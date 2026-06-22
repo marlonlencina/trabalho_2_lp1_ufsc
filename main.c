@@ -61,34 +61,6 @@ void menuLocations(t_app_state *app_state)
     actionMenuLocations(option, app_state);
 }
 
-t_string getFilepathMatchEntity(t_entities entity, string base_filepath)
-{
-    t_string object = {.response = ""};
-    switch (entity)
-    {
-    case LOCATION:
-        strcat(object.response, "./output/locations/");
-        strcat(object.response, base_filepath);
-        break;
-    case SECTOR:
-        strcat(object.response, "./output/sectors/");
-        strcat(object.response, base_filepath);
-        break;
-    case SENSOR:
-        strcat(object.response, "./output/sensors/");
-        strcat(object.response, base_filepath);
-        break;
-    case INSPECTION:
-        strcat(object.response, "./output/inspections/");
-        strcat(object.response, base_filepath);
-        break;
-    default:
-        strcat(object.response, "./output/");
-        strcat(object.response, base_filepath);
-        break;
-    }
-    return object;
-}
 void loadLocationsFromFile(t_app_state *app_state, string filepath)
 {
     FILE *file = NULL;
@@ -187,12 +159,8 @@ void loadInspectionsFromFile(t_app_state *app_state, string filepath)
     }
 
     t_inspection record_inspection;
-    printf("cheguei aqui. \n\n");
-    printf("filepath:  %s\n\n", filepath);
     while (fread(&record_inspection, sizeof(t_inspection), 1, file) == 1)
     {
-        printf("cheguei aqui. 2\n\n");
-        printf("inspaction id: %s. \n\n", record_inspection.id);
         int has_already_inserted = 0;
         t_inspection *new_inspection = (t_inspection *)malloc(sizeof(t_inspection));
         if (new_inspection)
@@ -1732,6 +1700,34 @@ void generateReportOfInspectionsVariation(t_location *locations)
     }
 };
 
+t_string getFilepathMatchEntity(t_entities entity, string base_filepath)
+{
+    t_string object = {.response = ""};
+    switch (entity)
+    {
+    case LOCATION:
+        strcat(object.response, "./output/locations/");
+        strcat(object.response, base_filepath);
+        break;
+    case SECTOR:
+        strcat(object.response, "./output/sectors/");
+        strcat(object.response, base_filepath);
+        break;
+    case SENSOR:
+        strcat(object.response, "./output/sensors/");
+        strcat(object.response, base_filepath);
+        break;
+    case INSPECTION:
+        strcat(object.response, "./output/inspections/");
+        strcat(object.response, base_filepath);
+        break;
+    default:
+        strcat(object.response, "./output/");
+        strcat(object.response, base_filepath);
+        break;
+    }
+    return object;
+}
 t_string mapSensorTypeToString(int sensor_type_enum)
 {
     t_string object;
