@@ -1,0 +1,33 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+}
+
+#tabela {
+  width: 100%;
+  table-layout: fixed;
+}
+
+#header {
+  width: 100%;
+}
+#header_item {
+  text-align: center;
+  background-color: rgba(128, 128, 128, 0.161);
+  padding: 16px;
+}
+
+#table_row {
+  width: 100%;
+  text-align: center;
+  height: 48px;
+}
+
+#caption_table {
+  font-weight: bold;
+  font-size: 24px;
+  padding: 24px 0;
+}
