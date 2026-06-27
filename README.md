@@ -7,6 +7,7 @@
 [X] [Joao] Exportar para arq. texto .csv  
 [X] [Joao] Exportar para arq. texto .html   
 [] Funçao recursiva  
+[] Consertar relatório de Variação (Variação por dia) e Média (De todos os tempos)
 [X] compilar codigo a partir de um Makefile  
 [X] desacoplar o main em arquivos .h e .c 
 
