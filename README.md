@@ -7,7 +7,7 @@
 [X] [Joao] Exportar para arq. texto .csv  
 [X] [Joao] Exportar para arq. texto .html   
 [] Funçao recursiva  
-[] compilar codigo a partir de um Makefile  
+[X] compilar codigo a partir de um Makefile  
 [X] desacoplar o main em arquivos .h e .c 
 
 
