@@ -1,3 +1,6 @@
+#ifndef TYPES_H
+#define TYPES_H
+#include "global_config.h"
 #define MAX_STRING_SIZE 1000
 
 typedef char string[MAX_STRING_SIZE];
@@ -87,6 +90,9 @@ typedef struct appState
     t_sensor *sensor_selected_pointer;
     t_inspection *inspection_selected_pointer;
     string default_binary_filename;
+    string default_filepath_to_output_folder;
     string filepath_csv;
     string filepath_html;
 } t_app_state;
+
+#endif
