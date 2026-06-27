@@ -208,7 +208,7 @@ void generateHtmlFile(t_app_state *app_state)
     fprintf(fp, "<br><br><br>\n");
 
     fprintf(fp, "<table>\n");
-    fprintf(fp, "<caption>Tabela de leitura de sensores</caption>");
+    fprintf(fp, "<caption>Tabela de leituras</caption>");
 
     fprintf(fp, "<thead>\n");
     fprintf(fp, "<tr>\n");

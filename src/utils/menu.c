@@ -11,7 +11,6 @@
 #include "../entities/sensors.h"
 #include "../entities/inspections.h"
 
-
 void menuLocations(t_app_state *app_state)
 {
     int option;
@@ -227,7 +226,7 @@ void actionMenuInspections(int option, t_app_state *app_state)
 }
 void handleGenerateSystemReport(t_app_state *app_state)
 {
-    int option;
+    int option = 1;
     while (option != 0)
     {
         printf("\033[1m[Relatórios]\033[0m\n");
@@ -238,6 +237,8 @@ void handleGenerateSystemReport(t_app_state *app_state)
         printf("4. Leituras (Variação). \n");
         printf("5. Leituras (Média). \n");
         printf("0. Voltar. \n");
+        printf(":: \n");
+
         scanf("%i", &option);
         getchar();
         switch (option)
@@ -264,7 +265,7 @@ void handleGenerateSystemReport(t_app_state *app_state)
 };
 void handleSearchInSystem(t_app_state *app_state)
 {
-    int option;
+    int option = 1;
     while (option != 0)
     {
         printf("\033[1m[Realizar Busca]\033[0m\n");
@@ -272,6 +273,8 @@ void handleSearchInSystem(t_app_state *app_state)
         printf("1. Descrição setor. \n");
         printf("2. Tipo de sensor. \n");
         printf("0. Voltar. \n");
+        printf(":: \n");
+
         scanf("%i", &option);
         getchar();
         switch (option)
@@ -297,6 +300,8 @@ void handleExportDataOfSystem(t_app_state *app_state)
         printf("1. Exportar como .csv\n");
         printf("2. Exportar como .html\n");
         printf("0. Voltar \n");
+        printf(":: \n");
+
         scanf("%i", &opcao);
         getchar();
 

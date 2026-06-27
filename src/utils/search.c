@@ -21,9 +21,9 @@ void searchForSectorDescription(t_location *locations)
             if (strcmp(description, current_sector->description) == 0)
             {
                 printf("Resultado da busca: \n");
-                printf("ID: %s\nNome: %s \nDescrição: %s \nQuantidade de "
+                printf("ID: %s\nID (PLANTA VINCULADA): %s\nNome: %s \nDescrição: %s \nQuantidade de "
                        "sensores: %i\n",
-                       current_sector->id, current_sector->name, current_sector->description,
+                       current_sector->id, current_sector->location_id, current_sector->name, current_sector->description,
                        countTotalSensors(current_sector->sensors));
                 printf("\n");
             }
