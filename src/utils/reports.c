@@ -88,6 +88,7 @@ void generateReportOfSensorsFile(t_location *locations, string filepath)
     if (!is_option_valid)
     {
         printf("Erro: Opção digitada inválida. \n");
+        fclose(file);
         return;
     }
 
@@ -267,6 +268,7 @@ void generateReportOfInspectionsFile(t_location *locations, string filepath)
     if (!is_option_valid)
     {
         printf("Erro: Opção digitada inválida. \n");
+        fclose(file);
         return;
     }
 
@@ -314,6 +316,7 @@ void generateReportOfInspectionsFile(t_location *locations, string filepath)
         if (location_found == NULL)
         {
             printf("Erro ao realizar relatório. \n");
+            fclose(file);
             return;
         }
 
@@ -338,7 +341,6 @@ void generateReportOfInspectionsFile(t_location *locations, string filepath)
                                     current_sensor->name, current_inspection->value,
                                     mapSensorTypeUnitToString(current_sensor->sensor_type).response,
                                     mapTimestampToString(current_inspection->date_inspection, true).response);
-                            current_inspection = current_inspection->next;
                             current_inspection = current_inspection->next;
                         }
                         current_sensor = current_sensor->next;
@@ -575,6 +577,7 @@ void generateReportOfInspectionsVariationFile(t_location *locations, string file
     if (!is_option_valid)
     {
         printf("Erro: Opção digitada inválida. \n");
+        fclose(file);
         return;
     }
 
@@ -582,12 +585,16 @@ void generateReportOfInspectionsVariationFile(t_location *locations, string file
     if (!location_found)
     {
         printf("Não foi possível encontrar sua planta. \n");
+        fclose(file);
+        return;
     }
     printf("Planta: %s \n", location_found->name);
     t_sector *sector_found = promptAndFindSectorByIdx(location_found->sectors);
     if (!sector_found)
     {
         printf("Não foi possível encontrar seu setor. \n");
+        fclose(file);
+        return;
     }
     printf("Setor: %s \n", sector_found->name);
     if (option == 0)
@@ -642,7 +649,13 @@ void generateReportOfInspectionsVariationFile(t_location *locations, string file
     else
     {
         t_sensor *sensor_found = promptAndFindSensorByIdx(sector_found->sensors);
+        if (!sensor_found)
+        {
+            printf("Não foi possível encontrar seu sensor. \n");
+            return;
+        }
         printf("Sensor: %s \n", sensor_found->name);
+
         t_inspection *inspection_found = sensor_found->inspections;
         while (inspection_found != NULL)
         {
@@ -706,12 +719,14 @@ void generateReportOfInspectionsVariationTerminal(t_location *locations)
     if (!location_found)
     {
         printf("Não foi possível encontrar sua planta. \n");
+        return;
     }
     printf("Planta: %s \n", location_found->name);
     t_sector *sector_found = promptAndFindSectorByIdx(location_found->sectors);
     if (!sector_found)
     {
         printf("Não foi possível encontrar seu setor. \n");
+        return;
     }
     printf("Setor: %s \n", sector_found->name);
     if (option == 0)
@@ -770,7 +785,13 @@ void generateReportOfInspectionsVariationTerminal(t_location *locations)
     else
     {
         t_sensor *sensor_found = promptAndFindSensorByIdx(sector_found->sensors);
+        if (!sensor_found)
+        {
+            printf("Não foi possível encontrar seu sensor. \n");
+            return;
+        }
         printf("Sensor: %s \n", sensor_found->name);
+
         t_inspection *inspection_found = sensor_found->inspections;
         while (inspection_found != NULL)
         {
