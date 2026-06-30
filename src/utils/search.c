@@ -32,6 +32,11 @@ void searchForSectorDescription(t_location *locations)
         current_location = current_location->next;
     }
 }
+
+//Caso base: se o ponteiro for NULL, o elemento não foi encontrado.
+//Caso de sucesso: se o nó atual contém o valor procurado, retorna esse nó.
+//Passo recursivo: chama a função para o próximo nó da lista.
+
 void searchForSensorType(t_location *locations)
 {
     int sensor_type_option;

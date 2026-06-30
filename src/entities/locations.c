@@ -41,7 +41,7 @@ void deleteLocationAtDatabase(t_location **list_locations, string location_id)
     t_location *current_location = *list_locations;
     t_location *temp;
 
-    t_location *location_to_delete = findLocationById(*list_locations, location_id);
+    t_location *location_to_delete = findLocationByIdRecursive(*list_locations, location_id);
 
     if (location_to_delete == NULL)
     {
@@ -101,6 +101,24 @@ t_location *findLocationById(t_location *list_locations, string location_id)
     }
     return copy_list_location ? copy_list_location : NULL;
     ;
+}
+t_location *findLocationByIdRecursive(t_location *list_locations, string location_id)
+{
+
+    if (list_locations)
+    {
+        // encontrou id // controle -> parada da função, quando encontrar sai da pilha
+        if (strcmp(list_locations->id, location_id) == 0)
+        {
+            return list_locations;
+        }
+        // continua busca
+        return findLocationByIdRecursive(list_locations->next, location_id);
+    }
+    else // lisst é null, ou seja, percorreu toda lista e nao achou, retorna null
+    {
+        return NULL;
+    }
 }
 t_location *findLocationByIdx(t_location *list_locations, int idx)
 {

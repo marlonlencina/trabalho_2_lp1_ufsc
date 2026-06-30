@@ -6,10 +6,12 @@
 
 [X] [Joao] Exportar para arq. texto .csv  
 [X] [Joao] Exportar para arq. texto .html   
-[] Funçao recursiva  
-[] Consertar relatório de Variação (Variação por dia) e Média (De todos os tempos)
+[X] Consertar relatório de Variação (Variação por dia) e Média (De todos os tempos)
 [X] compilar codigo a partir de um Makefile  
 [X] desacoplar o main em arquivos .h e .c 
 
+[] Todos os relatórios devem ter duas opções de saída: na tela e em arquivo texto, o qual o
+usuário deverá informar o nome.
+[X] Pelo menos uma das funções de busca deverá ser implementada de forma recursiva
 
 By marlon e joao (Also know as Xaropinho)  
