@@ -9,13 +9,14 @@
 void generateReportsOfSectors(t_location *locations)
 {
     int option_output_selection = outputSelectionLog();
+    string filepath = "./output/sectors/report.txt";
     if (option_output_selection == -1)
     {
         printf("Opção digitada é inválida, cancelando a operação. \n");
         return;
     }
 
-    option_output_selection == 1 ? generateReportsOfSectorsFile(locations, "./output/sectors/report.txt")
+    option_output_selection == 1 ? generateReportsOfSectorsFile(locations, filepath)
                                  : generateReportsOfSectorsTerminal(locations);
 }
 void generateReportsOfSectorsFile(t_location *locations, string filepath)
@@ -62,13 +63,14 @@ void generateReportsOfSectorsTerminal(t_location *locations)
 void generateReportOfSensors(t_location *locations)
 {
     int option_output_selection = outputSelectionLog();
+    string filepath = "./output/sensors/report.txt";
     if (option_output_selection == -1)
     {
         printf("Opção digitada é inválida, cancelando a operação. \n");
         return;
     }
 
-    option_output_selection == 1 ? generateReportOfSensorsFile(locations, "./output/sensors/report.txt")
+    option_output_selection == 1 ? generateReportOfSensorsFile(locations, filepath)
                                  : generateReportOfSensorsTerminal(locations);
 }
 void generateReportOfSensorsFile(t_location *locations, string filepath)
@@ -240,15 +242,15 @@ void generateReportOfSensorsTerminal(t_location *locations)
 
 void generateReportOfInspections(t_location *locations)
 {
-
     int option_output_selection = outputSelectionLog();
+    string filepath = "./output/inspections/report.txt";
     if (option_output_selection == -1)
     {
         printf("Opção digitada é inválida, cancelando a operação. \n");
         return;
     }
 
-    option_output_selection == 1 ? generateReportOfInspectionsFile(locations, "./output/inspections/report.txt")
+    option_output_selection == 1 ? generateReportOfInspectionsFile(locations, filepath)
                                  : generateReportOfInspectionsTerminal(locations);
 }
 void generateReportOfInspectionsFile(t_location *locations, string filepath)
@@ -457,15 +459,16 @@ void generateReportOfInspectionsTerminal(t_location *locations)
 void generateReportOfInspectionsAverage(t_location *locations)
 {
     int option_output_selection = outputSelectionLog();
+    string filepath = "./output/inspections/report_average.txt";
+
     if (option_output_selection == -1)
     {
         printf("Opção digitada é inválida, cancelando a operação. \n");
         return;
     }
 
-    option_output_selection == 1
-        ? generateReportOfInspectionsAverageFile(locations, "./output/inspections/report_average.txt")
-        : generateReportOfInspectionsAverageTerminal(locations);
+    option_output_selection == 1 ? generateReportOfInspectionsAverageFile(locations, filepath)
+                                 : generateReportOfInspectionsAverageTerminal(locations);
 };
 void generateReportOfInspectionsAverageFile(t_location *locations, string filepath)
 {
@@ -552,15 +555,16 @@ void generateReportOfInspectionsAverageTerminal(t_location *locations)
 void generateReportOfInspectionsVariation(t_location *locations)
 {
     int option_output_selection = outputSelectionLog();
+    string filepath = "./output/inspections/report_variation.txt";
+
     if (option_output_selection == -1)
     {
         printf("Opção digitada é inválida, cancelando a operação. \n");
         return;
     }
 
-    option_output_selection == 1
-        ? generateReportOfInspectionsVariationFile(locations, "./output/inspections/report_variation.txt")
-        : generateReportOfInspectionsVariationTerminal(locations);
+    option_output_selection == 1 ? generateReportOfInspectionsVariationFile(locations, filepath)
+                                 : generateReportOfInspectionsVariationTerminal(locations);
 }
 void generateReportOfInspectionsVariationFile(t_location *locations, string filepath)
 {
