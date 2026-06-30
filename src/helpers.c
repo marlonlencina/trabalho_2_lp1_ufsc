@@ -102,6 +102,20 @@ bool checkIfIsTheSameDay(time_t firstTimestamp, time_t secondTimestamp)
     return date_a_copy.tm_mday == date_b->tm_mday && date_a_copy.tm_mon == date_b->tm_mon &&
            date_a_copy.tm_year == date_b->tm_year;
 }
+int checkQuantityOfInspectionsOnDate(time_t timestamp, t_sensor *sensor_selected_pointer)
+{
+    int counter = 0;
+    t_inspection *current_inspection = sensor_selected_pointer->inspections;
+    while (current_inspection)
+    {
+        if (checkIfIsTheSameDay(current_inspection->date_inspection, timestamp))
+        {
+            counter++;
+        }
+        current_inspection = current_inspection->next;
+    }
+    return counter;
+}
 void resetStateOfMenuSelectedPointers(t_entities entity_type, t_app_state *state)
 {
     switch (entity_type)

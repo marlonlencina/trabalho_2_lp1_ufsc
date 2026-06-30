@@ -15,6 +15,7 @@ void generateUniqueId(char *buffer, t_entities entity_type);
 void formatStringRemoveEnter(string str);
 void formatStringToUppercase(string str);
 void formatStringToSystemPattern(string str);
+int checkQuantityOfInspectionsOnDate(time_t timestamp, t_sensor *sensor_selected_pointer);
 
 void resetStateOfMenuSelectedPointers(t_entities entity_type, t_app_state *state);
 void shutdownProgram();

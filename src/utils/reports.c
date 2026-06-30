@@ -6,7 +6,6 @@
 #include "../entities/locations.h"
 #include "../entities/inspections.h"
 
-
 void generateReportsOfSectors(t_location *locations)
 {
     t_location *current_location = locations;
@@ -225,22 +224,22 @@ void generateReportOfInspectionsAverage(t_location *locations)
                 while (current_inspection != NULL)
                 {
                     counter_sum_values = counter_sum_values + current_inspection->value;
-                    if (countTotalInspections(current_sensor->inspections) > 0)
-                    {
-                        printf("\n");
-                        printf("Planta: %s \n", current_location->name);
-                        printf("  Setor: %s\n", current_sector->name);
-                        printf("    Sensor: %s\n", current_sensor->name);
-                        printf("       Média: %.4f %s. \n",
-                               counter_sum_values / (float)countTotalInspections(current_sensor->inspections),
-                               mapSensorTypeUnitToString(current_sensor->sensor_type).response);
-                        printf("\n");
-                    }
-                    else
-                    {
-                        printf("- O sensor: %s ainda não possui leituras.\n", current_sensor->name);
-                    }
                     current_inspection = current_inspection->next;
+                }
+                if (countTotalInspections(current_sensor->inspections) > 0)
+                {
+                    printf("\n");
+                    printf("Planta: %s \n", current_location->name);
+                    printf("  Setor: %s\n", current_sector->name);
+                    printf("    Sensor: %s\n", current_sensor->name);
+                    printf("       Média: %.2f %s. \n",
+                           counter_sum_values / (float)countTotalInspections(current_sensor->inspections),
+                           mapSensorTypeUnitToString(current_sensor->sensor_type).response);
+                    printf("\n");
+                }
+                else
+                {
+                    printf("- O sensor: %s ainda não possui leituras.\n", current_sensor->name);
                 }
                 current_sensor = current_sensor->next;
             }
@@ -316,6 +315,11 @@ void generateReportOfInspectionsVariation(t_location *locations)
                         printf("    Sensor: %s \n", sensor_found->name);
                         printf("      Data: %s -> Variação do sensor: %.2f %s.\n", object_date.response,
                                variation_between_values, mapSensorTypeUnitToString(sensor_found->sensor_type).response);
+                        printf("        Primeira leitura do dia: %.2f %s -> última leitura do dia: %.2f %s.\n",
+                               first_inspection_of_the_day->value,
+                               mapSensorTypeUnitToString(sensor_found->sensor_type).response,
+                               second_inspection_of_the_day->value,
+                               mapSensorTypeUnitToString(sensor_found->sensor_type).response);
                         printf("\n");
                     }
                     inspection_found_next = inspection_found_next->next;
@@ -362,6 +366,11 @@ void generateReportOfInspectionsVariation(t_location *locations)
                     printf("    Sensor: %s \n", sensor_found->name);
                     printf("      Data: %s -> Variação do sensor: %.2f %s.\n", object_date.response,
                            variation_between_values, mapSensorTypeUnitToString(sensor_found->sensor_type).response);
+                    printf("        Primeira leitura do dia: %.2f %s -> última leitura do dia: %.2f %s.\n",
+                           first_inspection_of_the_day->value,
+                           mapSensorTypeUnitToString(sensor_found->sensor_type).response,
+                           second_inspection_of_the_day->value,
+                           mapSensorTypeUnitToString(sensor_found->sensor_type).response);
                     printf("\n");
                 }
                 inspection_found_next = inspection_found_next->next;

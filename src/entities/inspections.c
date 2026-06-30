@@ -14,6 +14,15 @@ t_inspection *createNewInspection(t_sensor *sensor_selected_pointer)
     time_t date;
     time(&date);
     new_inspection->date_inspection = date;
+
+    int quantityOfInspectionsOnThisDay = checkQuantityOfInspectionsOnDate(date, sensor_selected_pointer);
+    if (quantityOfInspectionsOnThisDay >= 2)
+    {
+        printf("\nErro: Você não pode gerar mais de duas leituras no mesmo dia \n\n");
+        new_inspection = NULL;
+        return new_inspection;
+    }
+
     strcpy(new_inspection->sensor_id, sensor_selected_pointer->id);
 
     printf("Digite o valor da leitura (%.2f-%.2f): \n", sensor_selected_pointer->range_min,
