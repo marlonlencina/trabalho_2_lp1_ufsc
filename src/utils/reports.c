@@ -285,11 +285,11 @@ void generateReportOfInspectionsFile(t_location *locations, string filepath)
                     while (current_inspection != NULL)
                     {
                         fprintf(file,
-                                "Planta: %s\nSetor: %s\nSensor: %s\nValor da "
+                                "ID: %s\nPlanta: %s\nSetor: %s\nSensor: %s\nValor da "
                                 "leitura: %.2f "
                                 "%s\nData: %s. \n",
-                                current_location->name, current_sector->name, current_sensor->name,
-                                current_inspection->value,
+                                current_inspection->id, current_location->name, current_sector->name,
+                                current_sensor->name, current_inspection->value,
                                 mapSensorTypeUnitToString(current_sensor->sensor_type).response,
                                 mapTimestampToString(current_inspection->date_inspection, true).response);
                         current_inspection = current_inspection->next;
@@ -330,15 +330,15 @@ void generateReportOfInspectionsFile(t_location *locations, string filepath)
                         t_inspection *current_inspection = current_sensor->inspections;
                         while (current_inspection != NULL)
                         {
-                            printf("\n");
-                            printf("Planta: %s\nSetor: %s\nSensor: %s\nValor da "
-                                   "leitura: %.2f "
-                                   "%s\nData: %s. \n",
-                                   current_location->name, current_sector->name, current_sensor->name,
-                                   current_inspection->value,
-                                   mapSensorTypeUnitToString(current_sensor->sensor_type).response,
-                                   mapTimestampToString(current_inspection->date_inspection, true).response);
-                            printf("\n");
+                            fprintf(file,
+                                    "ID: %s\nPlanta: %s\nSetor: %s\nSensor: %s\nValor da "
+                                    "leitura: %.2f "
+                                    "%s\nData: %s. \n",
+                                    current_inspection->id, current_location->name, current_sector->name,
+                                    current_sensor->name, current_inspection->value,
+                                    mapSensorTypeUnitToString(current_sensor->sensor_type).response,
+                                    mapTimestampToString(current_inspection->date_inspection, true).response);
+                            current_inspection = current_inspection->next;
                             current_inspection = current_inspection->next;
                         }
                         current_sensor = current_sensor->next;
@@ -490,7 +490,7 @@ void generateReportOfInspectionsAverageFile(t_location *locations, string filepa
                 }
                 if (countTotalInspections(current_sensor->inspections) > 0)
                 {
-                    fprintf(file, "Planta: %s \n Setor: %s\n Sensor: %s\n Média: %.2f %s. \n", current_location->name,
+                    fprintf(file, "Planta: %s\nSetor: %s\nSensor: %s\nMédia: %.2f %s.\n", current_location->name,
                             current_sector->name, current_sensor->name,
                             counter_sum_values / (float)countTotalInspections(current_sensor->inspections),
                             mapSensorTypeUnitToString(current_sensor->sensor_type).response);
@@ -622,19 +622,15 @@ void generateReportOfInspectionsVariationFile(t_location *locations, string file
                         float variation_between_values =
                             second_inspection_of_the_day->value - first_inspection_of_the_day->value;
 
-                        printf("\n");
-
-                        printf("Planta: %s \n", location_found->name);
-                        printf("  Setor: %s \n", sector_found->name);
-                        printf("    Sensor: %s \n", sensor_found->name);
-                        printf("      Data: %s -> Variação do sensor: %.2f %s.\n", object_date.response,
-                               variation_between_values, mapSensorTypeUnitToString(sensor_found->sensor_type).response);
-                        printf("        Primeira leitura do dia: %.2f %s -> última leitura do dia: %.2f %s.\n",
-                               first_inspection_of_the_day->value,
-                               mapSensorTypeUnitToString(sensor_found->sensor_type).response,
-                               second_inspection_of_the_day->value,
-                               mapSensorTypeUnitToString(sensor_found->sensor_type).response);
-                        printf("\n");
+                        fprintf(file,
+                                "Planta: %s\nSetor: %s\nSensor: %s\nData: %s -> Variação do sensor: %.2f %s.\n"
+                                "Primeira leitura do dia: %.2f %s -> última leitura do dia: %.2f %s.\n",
+                                location_found->name, sector_found->name, sensor_found->name, object_date.response,
+                                variation_between_values, mapSensorTypeUnitToString(sensor_found->sensor_type).response,
+                                first_inspection_of_the_day->value,
+                                mapSensorTypeUnitToString(sensor_found->sensor_type).response,
+                                second_inspection_of_the_day->value,
+                                mapSensorTypeUnitToString(sensor_found->sensor_type).response);
                     }
                     inspection_found_next = inspection_found_next->next;
                 }
@@ -673,16 +669,15 @@ void generateReportOfInspectionsVariationFile(t_location *locations, string file
                     float variation_between_values =
                         second_inspection_of_the_day->value - first_inspection_of_the_day->value;
 
-                    printf("\n");
-
-                    printf("Planta: %s \n Setor: %s \n Sensor: %s \n Data: %s -> Variação do sensor: %.2f %s.\n "
-                           "Primeira leitura do dia: %.2f %s -> última leitura do dia: %.2f %s.\n",
-                           location_found->name, sector_found->name, sensor_found->name, object_date.response,
-                           variation_between_values, mapSensorTypeUnitToString(sensor_found->sensor_type).response,
-                           first_inspection_of_the_day->value,
-                           mapSensorTypeUnitToString(sensor_found->sensor_type).response,
-                           second_inspection_of_the_day->value,
-                           mapSensorTypeUnitToString(sensor_found->sensor_type).response);
+                    fprintf(file,
+                            "Planta: %s \nSetor: %s \nSensor: %s\n Data: %s -> Variação do sensor: %.2f %s.\n"
+                            "Primeira leitura do dia: %.2f %s -> última leitura do dia: %.2f %s.\n",
+                            location_found->name, sector_found->name, sensor_found->name, object_date.response,
+                            variation_between_values, mapSensorTypeUnitToString(sensor_found->sensor_type).response,
+                            first_inspection_of_the_day->value,
+                            mapSensorTypeUnitToString(sensor_found->sensor_type).response,
+                            second_inspection_of_the_day->value,
+                            mapSensorTypeUnitToString(sensor_found->sensor_type).response);
                 }
                 inspection_found_next = inspection_found_next->next;
             }
