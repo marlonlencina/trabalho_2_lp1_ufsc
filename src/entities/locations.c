@@ -14,6 +14,9 @@ t_location *createNewLocation()
     fgets(new_location->name, MAX_STRING_SIZE, stdin);
     formatStringToSystemPattern(new_location->name);
 
+    new_location->sectors = NULL;
+    new_location->next = NULL;
+
     printf("Nova planta foi cadastrada com sucesso. \n");
     return new_location;
 };

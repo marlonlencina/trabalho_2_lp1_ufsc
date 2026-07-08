@@ -1,1 +1,0 @@
-ID: SECTO_1782835582_1357851370, Nome: LAB, Descrição: , Quantidade de sensores: 1.

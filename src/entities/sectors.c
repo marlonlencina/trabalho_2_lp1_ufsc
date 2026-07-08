@@ -19,6 +19,9 @@ t_sector *createNewSector(t_location *location_selected_pointer)
 
     strcpy(new_sector->location_id, location_selected_pointer->id);
 
+    new_sector->next = NULL;
+    new_sector->sensors = NULL;
+
     printf("Novo setor foi cadastrado com sucesso. \n");
 
     return new_sector;

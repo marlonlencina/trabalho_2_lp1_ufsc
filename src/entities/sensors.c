@@ -37,6 +37,9 @@ t_sensor *createNewSensor(t_sector *sector_selected_pointer)
 
     printf("Sensor '%s' vinculado ao setor com sucesso. \n", new_sensor->name);
 
+    new_sensor->next = NULL;
+    new_sensor->inspections = NULL;
+
     return new_sensor;
 };
 void insertNewSensorAtDatabase(t_sensor **list_sensors, t_sensor *new_sensor)

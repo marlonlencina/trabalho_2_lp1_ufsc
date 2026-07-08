@@ -43,6 +43,9 @@ t_inspection *createNewInspection(t_sensor *sensor_selected_pointer)
     }
 
     printf("Nova leitura foi cadastrada com sucesso. \n");
+
+    new_inspection->next = NULL;
+
     return new_inspection;
 };
 void insertNewInspectionAtDatabase(t_inspection **list_inspections, t_inspection *new_inspection)
